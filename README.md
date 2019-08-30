@@ -6,6 +6,9 @@
 /_/  /_/_(_)   /_/ |_/_/\__, /\__,_/\___/_/ /_/ /____/  /_____/_/\____/\__, /  
                        /____/                                         /____/
 </pre>
+
 This is the repo for Mr. Rigden's Blog.
+
 **© 2019 Jason Rigden**
+
 ***Unless explicitly stated otherwise all rights reserved.*** 
