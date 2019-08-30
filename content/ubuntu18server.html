@@ -1,0 +1,184 @@
+title: 'Setting Up a Basic Server with Ubuntu 18.04 LTS (Bionic Beaver)'
+date: '8/30/2019'
+tags: 
+- 'Ubuntu'
+- 'server'
+- 'tutorial'
+==========
+<blockquote>
+        This guide serves as the template for all my servers running Ubuntu 18.04 LTS (Bionic Beaver). The default server installation needs additional configuration before being considered appropriate to use in production. Although it is popular to use automation tools nowadays, this guide does not. We will do everything by hand. This will be an artisanal server.
+</blockquote>
+
+<h2>
+Prerequisites
+</h2>
+<p>
+This guide assumes that you this will be a remote server. This server should already have Ubuntu 18.04 LTS. This server needs to have an SSH server and you need have root access.
+</p>
+<p>
+We will be using <code>REMOTE_SERVER_IP</code> as placeholder for the IP address of the remote server. We'll use <code>USER_NAME</code> as the placeholder for your user name.
+</p>
+
+<h2>
+Remote Login
+</h2>
+
+<pre><code class="bash">ssh root@REMOTE_SERVER_IP</code></pre>
+
+
+<h2>Update the Server
+</h2>
+<p>
+Update the software repositories.
+
+<pre><code class="bash">apt-get update</code></pre>
+</p>
+<p>
+Install updated software
+<pre><code class="bash">apt-get upgrade</code></pre>
+</p>
+
+<h2>
+Nano
+</h2>
+<p>
+Unless you have confidence with another terminal editor, you should use <code>nano</code>. If nano is not already installed, you can install it easily.
+<pre><code class="bash">apt-get install nano</code></pre>
+</p>
+
+<h2>
+Create a User
+</h2>
+<p>
+Running as <code>root</code> is discouraged. Instead we will create a new user with <code>sudo</code> privileges.
+<pre><code class="bash">adduser USER_NAME</code></pre>
+</p>
+
+<p>
+You will be asked to set the new user’s password then a few other questions that can be left blank.
+</p>
+
+<p>
+Now give this user sudo privileges.
+<pre><code class="bash">usermod -aG sudo USER_NAME</code></pre>
+</p>
+
+<h2>
+Generate SSH Keys
+</h2>
+<p>
+If you already have SSH keys ready, skip this section. On your local machine generate your pair of SSH keys.
+<pre><code class="bash">ssh-keygen</code></pre>
+</p>
+<p>
+You will be asked several questsion. Accept the default file location for the key. Answer the others as you wish.
+</p>
+<blockquote>
+Note: If you leave the passphrase blank, then your system will be less secure. Possession of the keys will be enough to gain access. Convenience is often the enemy of security.
+</blockquote>
+
+
+<h2>
+Copy the Public Key
+</h2>
+<p>
+On your local machine copy your public SSH key to the remote server.
+<pre><code class="bash">ssh-copy-id USER_NAME@REMOTE_SERVER_IP</code></pre>
+</p>
+<p>
+<strong>Remember to use the password for the new user!</strong>
+</p>   
+<p>After the key has been successfully copied, log into the remote server as <code>USER_NAME</code>.</p>
+<pre><code class="bash">ssh USER_NAME@REMOTE_SERVER_IP</code></pre>
+
+<h2>
+Harden SSH
+</h2>
+<p>
+We are going to reconfigure our SSH server by editing <code>sshd_config</code>.
+<pre><code class="bash">sudo nano /etc/ssh/sshd_config</code></pre>
+</p> 
+<p>
+Check and make sure that public key authentication is enabled. Find the line that starts <code>PubkeyAuthentication</code>. Make sure it is set you <code>yes</code>.
+<pre><code class="bash">PermitRootLogin no</code></pre>
+</p>
+<p>
+Reload the SSH server. This may cause you to lose your SSH connection.
+<pre><code class="bash">sudo service ssh restart</code></pre>
+</p>
+<p>
+If you would like a more info about securing SSH, please read my post <a href="https://medium.com/p/hardening-ssh-1bcb99cd4cef">Hardening SSH</a>.
+</p>
+
+<h2>
+The Firewall
+</h2>
+<p>
+Install the Uncomplicated Firewall(UFW).
+<pre><code class="bash">sudo apt-get install ufw</code></pre>
+</p>
+<p>
+Then enable the firewall.
+<pre><code class="bash">sudo ufw enable</code></pre>
+</p>
+<p>
+If you would like a more detailed guide to UFW check out my post, <a href="https://medium.com/@mr_rigden/a-guide-to-the-uncomplicated-firewall-ufw-for-linux-570c3774d7f4">A Guide to the Uncomplicated Firewall (UFW) for Linux</a>.
+</p>
+
+<h2>
+Name Your Server
+</h2>
+<p>
+Generic server names can be confusing. In this guide we will name our server <code>seattle</code>. Let’s change the hostname.
+<pre><code class="bash">sudo nano /etc/hostname</code></pre>
+</p>
+<p>Change it to <code>seattle</code>. Now edit the hosts file.
+
+<pre><code class="bash">sudo nano /etc/hosts</code></pre>
+</p>
+
+<p>
+It should look like this:
+<pre><code class="bash">127.0.0.1 localhost
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters</code></pre>
+</p>
+<p>
+And add you server name like so:
+<pre><code class="bash">127.0.0.1 localhost
+127.0.1.1 seattle
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters</code></pre>
+</p>
+<p>
+Now reboot.
+<pre><code class="bash">sudo reboot</code></pre>
+</p>
+
+
+<h2>
+Time
+</h2>
+<p>
+Set you sever on an appropriate timezone. For me that is Pacific time.
+<pre><code class="bash">sudo timedatectl set-timezone America/Los_Angeles</code></pre>
+</p>
+<p>
+Then make sure the server is using the Network Time Protocol.
+<pre><code class="bash">sudo timedatectl set-ntp on</code></pre>
+</p>
+
+
+<h2>
+Conclusion
+</h2>
+<p>
+If have followed this guide you will have a basic server that is just a bit more secure.
+</p>
+    

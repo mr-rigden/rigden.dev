@@ -1,0 +1,10 @@
+title: "Mr. Rigden's Blog"
+author: 'Jason Rigden'
+baseURL: 'https://rigden.dev/'
+links:
+- name: 'YouTube'
+  url: 'https://www.youtube.com/channel/UCaznk2AsVEhlAl0u2fOLNsw'
+- name: 'Contact'
+  url: 'https://jasonrigden.com/about/#contact'
+- name: 'About Me'
+  url: 'https://jasonrigden.com'
